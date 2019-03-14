@@ -1,16 +1,12 @@
-// 
 const fs = require('fs');
-//const stream = require('stream');
-var theText = [];
-var regex = /\s+/;
+
 var isDictionaryComplete = false;
-
-const order = 3;
-const group_size = order + 1;
-const inputFile = "buckle.txt";
-const theLength = 50; // Length of the generated output
-
-// markovDictionary = new Map();
+var theText = [];
+var regex = /\s+/;              // Split based on white spaces of any length
+const order = 2;                // Size of the current Markov state 0 means random words. 1 means random word based on last one word, etc.
+const group_size = order + 1;   // Size of the chunks of words, the Markov state plus the next word.
+const inputFile = "trump.txt";  // Source file for "training."  Should be text file with words.
+const theLength = 75;           // Length of the generated output.
 
 function train (textArray, filename, isDictFinished, myCallback) {
     var dictionary = new Map();
@@ -115,7 +111,7 @@ var markovDictionary = train(theText,inputFile, isDictionaryComplete, finalresul
 function generate (dict, len) {
     // As a place to start, pick a random set of ORDER number of words and store them in RESULT
     //
-    if (group_size < theLength) {
+    if (group_size < len) {
         var startingIndex = Math.floor(Math.random() * dict.size);
         var next_word = ""; // Randomly selected next word from values based on given key
         var result = Array.from(dict.keys())[startingIndex];
@@ -129,7 +125,7 @@ function generate (dict, len) {
         var state = result_array.slice(result_array.length - order );
         console.log (`Current state:${state}`);
         //console.log (`Current result:${result_array.join(' ')}`);
-        while (result_array.length < theLength) {
+        while (result_array.length < len) {
             next_word = sample(dict.get(state.join(' ')));
             result_array.push(next_word);
             state = result_array.slice(result_array.length - order );
@@ -168,7 +164,7 @@ function sample(array) {
 
 function finalresult() {
         //
-        generate (markovDictionary, 1);    
+        generate (markovDictionary, theLength);    
         console.log ('\nDone.');
 
         } 
