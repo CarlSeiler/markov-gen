@@ -1,4 +1,7 @@
 const fs = require('fs');
+const events = require('events');
+
+var emitter = new events.EventEmitter();
 
 var isDictionaryComplete = false;
 var theText = [];
@@ -7,6 +10,16 @@ const order = 2;                // Size of the current Markov state 0 means rand
 const group_size = order + 1;   // Size of the chunks of words, the Markov state plus the next word.
 const inputFile = "trump.txt";  // Source file for "training."  Should be text file with words.
 const theLength = 75;           // Length of the generated output.
+
+// *** MAIN ****
+var markovDictionary = train(theText,inputFile, isDictionaryComplete, EmitTrainingComplete );
+
+emitter.on('TrainingComplete', () => {
+    generate (markovDictionary, theLength);    
+    console.log ('\nDone.');
+});
+
+// *** Functions ***
 
 function train (textArray, filename, isDictFinished, myCallback) {
     var dictionary = new Map();
@@ -103,23 +116,18 @@ function train (textArray, filename, isDictFinished, myCallback) {
     });
     return dictionary; 
     }
-var markovDictionary = train(theText,inputFile, isDictionaryComplete, finalresult);
-
-
-
 
 function generate (dict, len) {
     // As a place to start, pick a random set of ORDER number of words and store them in RESULT
     //
     if (group_size < len) {
         var startingIndex = Math.floor(Math.random() * dict.size);
-        var next_word = ""; // Randomly selected next word from values based on given key
+        var next_word = ""; // Will store randomly selected next word from values based on given key
         var result = Array.from(dict.keys())[startingIndex];
-        // console.log (`Key at startingIndex:${result}`);
         // Look up that KEY in the dictionary and randomly pick the next word, and stick it on RESULT
         next_word = sample(dict.get(result));
         result = result + " " + next_word;
-        // Easier to work with arrays, so make this an array really quick
+        // Easier to work with arrays, so make this an array
         var result_array = result.split(" ");
         //setup our initial state
         var state = result_array.slice(result_array.length - order );
@@ -160,12 +168,6 @@ function sample(array) {
     // This should be a string in this case.
     return array[Math.floor (Math.random() * array.length)];
 }
-
-
-function finalresult() {
-        //
-        generate (markovDictionary, theLength);    
-        console.log ('\nDone.');
-
-        } 
-
+function EmitTrainingComplete() {
+    emitter.emit('TrainingComplete')
+};
