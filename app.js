@@ -1,6 +1,5 @@
 const fs = require('fs');
 const events = require('events');
-
 var emitter = new events.EventEmitter();
 
 var isDictionaryComplete = false;
@@ -12,7 +11,7 @@ const inputFile = "trump.txt";  // Source file for "training."  Should be text f
 const theLength = 75;           // Length of the generated output.
 
 // *** MAIN ****
-var markovDictionary = train(theText,inputFile, isDictionaryComplete, EmitTrainingComplete );
+var markovDictionary = train(theText,inputFile, isDictionaryComplete, emitTrainingComplete );
 
 emitter.on('TrainingComplete', () => {
     generate (markovDictionary, theLength);    
@@ -168,6 +167,7 @@ function sample(array) {
     // This should be a string in this case.
     return array[Math.floor (Math.random() * array.length)];
 }
-function EmitTrainingComplete() {
+function emitTrainingComplete() {
     emitter.emit('TrainingComplete')
 };
+function 
