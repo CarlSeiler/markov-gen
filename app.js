@@ -2,13 +2,16 @@ const fs = require('fs');
 const events = require('events');
 var emitter = new events.EventEmitter();
 
-var isDictionaryComplete = false;
+var isDictionaryComplete = false;   
 var theText = [];
-var regex = /\s+/;              // Split based on white spaces of any length
-const order = 2;                // Size of the current Markov state 0 means random words. 1 means random word based on last one word, etc.
-const group_size = order + 1;   // Size of the chunks of words, the Markov state plus the next word.
-const inputFile = "trump.txt";  // Source file for "training."  Should be text file with words.
-const theLength = 75;           // Length of the generated output.
+var regex = /\s+/;                  // Split based on white spaces of any length
+const order = 2;                    // Size of the current Markov state 0 means random words. 1 means random word based on last one word, etc.
+const group_size = order + 1;       // Size of the chunks of words, the Markov state plus the next word.
+const defaultInput = "./input.txt"  // Default source file if none on command line
+var inputFile = considerArgsForInput();    // Source file for "training."  Should be text file with words.
+const theLength = 75;               // Length of the generated output.
+
+//console.log (inputFile);
 
 // *** MAIN ****
 var markovDictionary = train(theText,inputFile, isDictionaryComplete, emitTrainingComplete );
@@ -21,13 +24,15 @@ emitter.on('TrainingComplete', () => {
 // *** Functions ***
 
 function train (textArray, filename, isDictFinished, myCallback) {
+    console.log ("Setting up map.");
     var dictionary = new Map();
-    fs.readFile(filename, 'utf8', (err, contents) => {
-        
-        console.log (`Reading input file '${filename}'`);
-        if (err) {
-            console.log(err.message);
+    console.log ("Preparing to read from: " + filename);
+    fs.readFile(filename, 'utf8', (error, contents) => {
+        if (error) {
+            console.log(error.message);
             console.log("Problem reading input.");
+            process.exit(1);
+            
         } else {
             textArray = contents.split(regex);
             console.log(`Finished reading from '${filename}'`);
@@ -46,7 +51,7 @@ function train (textArray, filename, isDictFinished, myCallback) {
                 if (textIndex <= textArray.length - (group_size)) {
                     var dictValue = []; // Each KEY is an array of length order and has has VALUE of
                     var newItem = "";
-                    // TODO For each element in the text array, build a dictionary KEY that constists
+                    // For each element in the text array, build a dictionary KEY that constists
                     // of an array of length order. Check to seee if it is already in the dictionary.
                     // If it is, push it on the array that holds the VALUEs. If it doesn't exist
                     // create the entry and add a single item array to the VALUEs.
@@ -54,15 +59,12 @@ function train (textArray, filename, isDictFinished, myCallback) {
                     var currentKey = buildKey(theArray, textIndex);
                     
                     if (dictionary.has(currentKey)) {
-                        // console.log('Item exists, adding value to key.');
                         newItem = theArray[textIndex+order];
-                         dictValue = dictionary.get(currentKey);
-                         dictValue.push(newItem);
-                         // console.log (`Adding value ${newItem} to ${currentKey}`);
-                         dictionary.set(currentKey, dictValue);
+                        dictValue = dictionary.get(currentKey);
+                        dictValue.push(newItem);
+                        dictionary.set(currentKey, dictValue);
                     } else {
                         newItem = theArray[textIndex+order];
-                        // console.log(`Item ${currentKey} does not exist.  Added entry with value ${newItem}`);
                         dictionary.set(currentKey, [newItem] );
                     }
                     function buildKey(textArray, currentIndex) {
@@ -74,7 +76,6 @@ function train (textArray, filename, isDictFinished, myCallback) {
                         thisKeyArray =[];
                         for (j = currentIndex; j < (currentIndex+order); j++) {
                             thisKeyArray.push(textArray[j]);
-                            //thisKeyString = thisKeyString + " " + textArray[j]                    }
                         }
                         thisKeyString = thisKeyArray.join(" ");
                         return thisKeyString;
@@ -87,32 +88,14 @@ function train (textArray, filename, isDictFinished, myCallback) {
                 }
     
             });
-            //console.log (dictionary);
-            //console.log (dictionary.size);
-            //this originally could have failed because Array.forEach technically does not provide call back and could theoretically 
-            // still be working when the forEach and have moved on to this.    This has been re-written to hopefully take
-            // advantage of this situation:
-            // https://stackoverflow.com/questions/18983138/callback-after-all-asynchronous-foreach-callbacks-are-completed
-            //
             function callback() {
                 isDictFinished = true;
                 myCallback();
-                
-                // // Parsing test:
-                // var x = "Humboldt";
-                // if (dictionary.has(x)) {
-                //     console.log(dictionary.get(x));
-                //     console.log(dictionary.get(x).length);
-                // }
-                // else {
-                //     console.log('Not found.');
-                // }
-            
-    
-            }
+           }
     
         }
     });
+    console.log ("Finished reading attempt");
     return dictionary; 
     }
 
@@ -152,15 +135,6 @@ function generate (dict, len) {
     } else {
         console.log (`The group_size must be smaller than theLength to be able to run.`);
     }
-    // console.log (result.typeof);
-    // var state = result; 
-    // //console.log (result + ` and len = ${len}`);
-    // for (i = 1; i <= len; i++) {
-    //     next_word = dict.get(state)[Math.floor(Math.random() * dict.get(state).length)];
-    //     result.push(next_word);
-    //     state = result.slice(-result.length-order );
-    // }
-    // console.log (result);
 };
 function sample(array) {
     // Takes an array and returns a random element 
@@ -170,4 +144,17 @@ function sample(array) {
 function emitTrainingComplete() {
     emitter.emit('TrainingComplete')
 };
-function 
+function considerArgsForInput () {
+    console.log ("Reading arguments if they exist.");
+    if (process.argv.length > 2)
+    {
+        console.log ("Returning: " + process.argv[2]);
+        return process.argv[2];
+        
+   }
+    else {
+        console.log ("Returning default value for input text file.");
+        return defaultInput;
+    }
+}
+//process.exit(0);
