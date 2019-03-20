@@ -1,0 +1,14 @@
+{
+  "name": "markov_experiment",
+  "version": "0.0.1",
+  "description": "markov chain text generator",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carl Seiler",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^5.15.3"
+  }
+}
