@@ -23,3 +23,5 @@ It will read from the input file `input.txt` by default.  This can be changed by
     node app.js differentinputfile.txt
 
 The resulting output is shown on console and is saved in `output.txt`.  While some error-checking does happen, the app expects to be able to read and output these files.  
+
+Comments are welcome on the issues page. You're welcome to grab it and use it. Keep in mind, I'm a hobbyist and dabbler.
