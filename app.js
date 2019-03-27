@@ -98,8 +98,6 @@ function generate (dict, len) {
         var result_array = result.split(" ");
         //setup our initial state
         var state = result_array.slice(result_array.length - order );
-        //console.log (`Current state:${state}`);
-        //console.log (`Current result:${result_array.join(' ')}`);
         while (result_array.length < len) {
             next_word = sample(dict.get(state.join(' ')));
             result_array.push(next_word);
@@ -110,10 +108,7 @@ function generate (dict, len) {
             if (err) {
                 return console.log(err.name + " " + err.message);
             }
-            else
-            {
-               // console.log('File saved as output.txt');
-            }
+            
         });   
         
         
