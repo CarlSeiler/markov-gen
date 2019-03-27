@@ -18,7 +18,11 @@ To run, just type:
 
     node app.js
 
+<<<<<<< HEAD
 It will read from the input file `input.txt` by default.  This can be changed by editing the value of the constant `inputFile` in the SETUP section.  Alternatively, you can pass it as a parameter:
+=======
+It will read from the input file `input.txt` by default.  This can be changed by editing the value of the constant `inputFile.txt` in the SETUP section.  Alternatively, you can pass it as a parameter:
+>>>>>>> b343a93a48e0826ac587cb6a34d54a710df13166
 
     node app.js differentinputfile.txt
 
