@@ -1,5 +1,5 @@
 /*eslint no-console: "off" */
-
+// *** SETUP *** //
 const fs = require('fs');
 const events = require('events');
 var emitter = new events.EventEmitter();
