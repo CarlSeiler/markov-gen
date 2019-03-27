@@ -1,6 +1,6 @@
 {
   "name": "markov_experiment",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "markov chain text generator",
   "main": "app.js",
   "scripts": {
